@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>CTF Challenge</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Login Challenge</a></li>
+            <li><a href="flag.html">Flag</a></li>
+        </ul>
+    </nav>
+
+    <h1>URL Parameter Manipulation Challenge</h1>
+    <p>Hint: A secret token is stored somewhere. Can you find and use it?</p>
+
+    <script src="http://localhost:5500/dynamic.js"></script>
+    <script>
+        (function () {
+            const queryParams = new URLSearchParams(window.location.search);
+            const token = queryParams.get("token");
+            const isAdmin = queryParams.get("isadmin");
+
+            if (token && isAdmin) {
+                fetch(`http://localhost:5500/validate?token=${encodeURIComponent(token)}&isAdmin=${encodeURIComponent(isAdmin)}`)
+                    .then(response => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else {
+                            response.text().then(text => {
+                                document.body.innerHTML += `<p style="color: red;">${text}</p>`;
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        document.body.innerHTML += `<p style="color: red;">An error occurred. Please try again.</p>`;
+                    });
+            }
+        })();
+    </script>
+</body>
+</html>
